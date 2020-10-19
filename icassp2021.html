@@ -1,0 +1,430 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Audio samples from "AN INVESTIGATION OF FAST AND EFFICIENT METHODS FOR MULTI-SPEAKER MODELING AND SPEAKER ADAPTATION"</title>
+    <link rel="stylesheet" href="../../stylesheet.css">
+    <link rel="shortcut icon" href="../../images/taco.png">
+  </head>
+  <body>
+    <article>
+      <header>
+        <h1>Audio samples from "AN INVESTIGATION OF FAST AND EFFICIENT METHODS FOR MULTI-SPEAKER MODELING AND SPEAKER ADAPTATION"</h1>
+      </header>
+    </article>
+
+    <p><b>Authors</b>: Yibin Zheng, Xinhui Li and Li Lu</p>
+
+    <div><b>Abstract:</b> In this paper, we propose a novel method for fast and efficient few-shot TTS tasks, which is able to disentangle linguistic and speaker representations. Specifically, an adversarial training strategy is firstly employed to  wipe out speaker information from the linguistic representations. Then the speaker representations are extracted from audio signals by a speaker encoder with random sampling mechanism and a speaker classifier, aiming to extract speaker embedding features that independent of content information (such as prosody and style etc).  Meanwhile,  for faster and efficient adaptation, we further introduce the prior alignment knowledge between the text and audio pairs and propose a multi-alignment guided attention to help the attention learning.  The Experimental results show that proposed method could not only generate both higher quality and similarity with an absolute improvement of 0.32 and 0.4 in MOS respectively,  when adapting new speakers with 20 utterances, but also converge much faster and efficient.    Moreover, we can achieve a MOS of 4.** for a premium voice with enough training data, and outperforms baseline result of 4.**.</div>
+
+
+    <p class="toc_title">Contents</p>
+    <div id="toc_container">
+    <ul>
+      <li><a href="#neural_vocoder">Style Tokens with neural vocoding</a></li>
+        <ol>
+          <li><a href="#neural_vocoder.style_selection">Style Selection</a></li>
+          <li><a href="#neural_vocoder.doesnt_affect_prosody">Prosody vs Audio Quality</a></li>
+        </ol>
+      <li><a href="#style_control">Style control</a></li>
+        <ol>
+          <li><a href="#style_control.selection">Style selection</a></li>
+          <li><a href="#style_control.scaling">Style scaling</a></li>
+          <li><a href="#style_control.morphing">Text-side style control/morphing</a></li>
+        </ol>
+    <li><a href="#style_transfer">Style transfer</a></li>
+      <ol>
+        <li><a href="#style_transfer.parallel">Parallel transfer</a></li>
+        <li><a href="#style_transfer.nonparallel">Non-parallel transfer</a></li>
+      </ol>
+    <li><a href="#noisy_data">Artificial noisy data</a></li>
+      <ol>
+        <li><a href="#noisy_data.learned_tokens">Tokens learned from a noisy dataset</a></li>
+        <li><a href="#noisy_data.clean_token_synth">Synthesizing with a clean Style Token</a></li>
+      </ol>
+    </ul>
+    </div>
+
+    <p>&nbsp;</p>
+
+    <div>
+      <a name="neural_vocoder"><h2>Speaker adaptation with small dataset</h2></a>
+      <div>
+        In this section, we use 4 Chinese speakers as target speaker, with each speakers has only 20 utterances (1-2 minutes of speech).
+      </div>
+      <a name="neural_vocoder.style_selection"><h3>Speaker latent space modeling</h3></a>
+      <a name="neural_audiobook"><h3>1. Long-form audiobook phrases </h3></a>
+
+      <div class="text_gst">Text: And without a backward glance at Harry, Filch ran flat-footed from the office, Mrs. Norris streaking alongside him. Peeves was the school poltergeist, a grinning, airborne menace who lived to cause havoc and distress.</div>
+      <table><tbody>
+        <tr><td>One-hot</td><td><audio controls=""><source src="listen/speaker_latent_space/one_hot/eval-03.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/speaker_latent_space/proposed/eval-03.wav"></audio></td></tr>
+      </tbody></table>
+      <div class="text_gst">Text: "I expect they've let it rot to give it a stronger flavor," said Hermione knowledgeably, pinching her nose and leaning closer to look at the putrid haggis. "Can we move? I feel sick," said Ron.</div>
+      <table><tbody>
+        <tr><td>One-hot</td><td><audio controls=""><source src="listen/speaker_latent_space/one_hot/eval-04.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/speaker_latent_space/proposed/eval-04.wav"></audio></td></tr>
+      </tbody></table>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>One-hot</td><td><audio controls=""><source src="listen/speaker_latent_space/one_hot/eval-05.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/speaker_latent_space/proposed/eval-05.wav"></audio></td></tr>
+     </tbody></table>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>One-hot</td><td><audio controls=""><source src="listen/speaker_latent_space/one_hot/eval-14.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/speaker_latent_space/proposed/eval-14.wav"></audio></td></tr>
+      </tbody></table>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>One-hot</td><td><audio controls=""><source src="listen/speaker_latent_space/one_hot/eval-15.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/speaker_latent_space/proposed/eval-15.wav"></audio></td></tr>
+      </tbody></table>
+	  
+      <a name="neural_vocoder.style_selection"><h3>average model</h3></a>
+      <div class="text_gst">Text: And without a backward glance at Harry, Filch ran flat-footed from the office, Mrs. Norris streaking alongside him. Peeves was the school poltergeist, a grinning, airborne menace who lived to cause havoc and distress.</div>
+      <table><tbody>
+        <tr><td>SE</td><td><audio controls=""><source src="listen/average_model/SE/eval-03.wav"></audio></td><td>SE+AT</td><td><audio controls=""><source src="listen/average_model/SE+AT/eval-03.wav"></audio></td></tr>
+      </tbody></table>
+      <div class="text_gst">Text: "I expect they've let it rot to give it a stronger flavor," said Hermione knowledgeably, pinching her nose and leaning closer to look at the putrid haggis. "Can we move? I feel sick," said Ron.</div>
+      <table><tbody>
+        <tr><td>SE</td><td><audio controls=""><source src="listen/average_model/SE/eval-04.wav"></audio></td><td>SE+AT</td><td><audio controls=""><source src="listen/average_model/SE+AT/eval-04.wav"></audio></td></tr>
+      </tbody></table>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>SE</td><td><audio controls=""><source src="listen/average_model/SE/eval-05.wav"></audio></td><td>SE+AT</td><td><audio controls=""><source src="listen/average_model/SE+AT/eval-05.wav"></audio></td></tr>
+     </tbody></table>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>SE</td><td><audio controls=""><source src="listen/average_model/SE/eval-14.wav"></audio></td><td>SE+AT</td><td><audio controls=""><source src="listen/average_model/SE+AT/eval-14.wav"></audio></td></tr>
+      </tbody></table>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>SE</td><td><audio controls=""><source src="listen/average_model/SE/eval-15.wav"></audio></td><td>SE+AT</td><td><audio controls=""><source src="listen/average_model/SE+AT/eval-15.wav"></audio></td></tr>
+      </tbody></table>
+	  
+      <a name="neural_vocoder.style_selection"><h3>training strategies</h3></a>
+      <a name="neural_audiobook"><h3>1. fix text encoder </h3></a>
+      <div class="text_gst">Text: And without a backward glance at Harry, Filch ran flat-footed from the office, Mrs. Norris streaking alongside him. Peeves was the school poltergeist, a grinning, airborne menace who lived to cause havoc and distress.</div>
+      <table><tbody>
+        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encode/fix/eval-03.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encode/all/eval-03.wav"></audio></td></tr>
+      </tbody></table>
+      <div class="text_gst">Text: "I expect they've let it rot to give it a stronger flavor," said Hermione knowledgeably, pinching her nose and leaning closer to look at the putrid haggis. "Can we move? I feel sick," said Ron.</div>
+      <table><tbody>
+        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encode/fix/eval-04.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encode/all/eval-04.wav"></audio></td></tr>
+      </tbody></table>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encode/fix/eval-05.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encode/all/eval-05.wav"></audio></td></tr>
+     </tbody></table>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encode/fix/eval-14.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encode/all/eval-14.wav"></audio></td></tr>
+      </tbody></table>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encode/fix/eval-15.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encode/all/eval-15.wav"></audio></td></tr>
+      </tbody></table>
+
+      <a name="neural_audiobook"><h3>2. guided attention</h3></a>	  
+     <div class="text_gst">Text: And without a backward glance at Harry, Filch ran flat-footed from the office, Mrs. Norris streaking alongside him. Peeves was the school poltergeist, a grinning, airborne menace who lived to cause havoc and distress.</div>
+      <table><tbody>
+        <tr><td>Baseline</td><td><audio controls=""><source src="listen/guided_attention/Baseline/eval-03.wav"></audio></td><td>GA</td><td><audio controls=""><source src="listen/guided_attention/GA/eval-03.wav"></audio></td><td>FA</td><td><audio controls=""><source src="listen/guided_attention/FA/eval-03.wav"></audio></td><td>MAGT</td><td><audio controls=""><source src="listen/guided_attention/MAGT/eval-03.wav"></audio></td></tr>
+      </tbody></table>
+      <div class="text_gst">Text: "I expect they've let it rot to give it a stronger flavor," said Hermione knowledgeably, pinching her nose and leaning closer to look at the putrid haggis. "Can we move? I feel sick," said Ron.</div>
+      <table><tbody>
+        <tr><td>Baseline</td><td><audio controls=""><source src="listen/guided_attention/Baseline/eval-04.wav"></audio></td><td>GA</td><td><audio controls=""><source src="listen/guided_attention/GA/eval-04.wav"></audio></td><td>FA</td><td><audio controls=""><source src="listen/guided_attention/FA/eval-04.wav"></audio></td><td>MAGT</td><td><audio controls=""><source src="listen/guided_attention/MAGT/eval-04.wav"></audio></td></tr>      </tbody></table>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>Baseline</td><td><audio controls=""><source src="listen/guided_attention/Baseline/eval-02.wav"></audio></td><td>GA</td><td><audio controls=""><source src="listen/guided_attention/GA/eval-02.wav"></audio></td><td>FA</td><td><audio controls=""><source src="listen/guided_attention/FA/eval-02.wav"></audio></td><td>MAGT</td><td><audio controls=""><source src="listen/guided_attention/MAGT/eval-02.wav"></audio></td></tr>     </tbody></table>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>Baseline</td><td><audio controls=""><source src="listen/guided_attention/Baseline/eval-19.wav"></audio></td><td>GA</td><td><audio controls=""><source src="listen/guided_attention/GA/eval-19.wav"></audio></td><td>FA</td><td><audio controls=""><source src="listen/guided_attention/FA/eval-19.wav"></audio></td><td>MAGT</td><td><audio controls=""><source src="listen/guided_attention/MAGT/eval-19.wav"></audio></td></tr>      </tbody></table>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>Baseline</td><td><audio controls=""><source src="listen/guided_attention/Baseline/eval-15.wav"></audio></td><td>GA</td><td><audio controls=""><source src="listen/guided_attention/GA/eval-15.wav"></audio></td><td>FA</td><td><audio controls=""><source src="listen/guided_attention/FA/eval-15.wav"></audio></td><td>MAGT</td><td><audio controls=""><source src="listen/guided_attention/MAGT/eval-15.wav"></audio></td></tr>      </tbody></table>
+	  
+      <a name="neural_vocoder.style_selection"><h3>overall performance</h3></a>
+    </div>
+    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <table>
+      <tbody>
+        <tr>
+          <th>Speaker</th>
+          <th>Baseline</th>
+          <th>Proposed</th>
+        </tr>
+        <tr><td>Speaker1</td>
+          <td><audio controls=""><source src="listen/overall/speaker1/baseline/eval-02.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker1/proposed/eval-02.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker2</td>
+          <td><audio controls=""><source src="listen/overall/speaker2/baseline/eval-02.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker2/proposed/eval-02.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker3</td>
+          <td><audio controls=""><source src="listen/overall/speaker3/baseline/eval-02.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker3/proposed/eval-02.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker4</td>
+          <td><audio controls=""><source src="listen/overall/speaker4/proposed/eval-02.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker4/proposed/eval-02.wav"></audio></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <table>
+      <tbody>
+        <tr>
+          <th>Speaker</th>
+          <th>Baseline</th>
+          <th>Proposed</th>
+        </tr>
+        <tr><td>Speaker1</td>
+          <td><audio controls=""><source src="listen/overall/speaker1/baseline/eval-03.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker1/proposed/eval-03.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker2</td>
+          <td><audio controls=""><source src="listen/overall/speaker2/baseline/eval-03.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker2/proposed/eval-03.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker3</td>
+          <td><audio controls=""><source src="listen/overall/speaker3/baseline/eval-03.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker3/proposed/eval-03.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker4</td>
+          <td><audio controls=""><source src="listen/overall/speaker4/proposed/eval-03.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker4/proposed/eval-03.wav"></audio></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <table>
+      <tbody>
+        <tr>
+          <th>Speaker</th>
+          <th>Baseline</th>
+          <th>Proposed</th>
+        </tr>
+        <tr><td>Speaker1</td>
+          <td><audio controls=""><source src="listen/overall/speaker1/baseline/eval-04.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker1/proposed/eval-04.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker2</td>
+          <td><audio controls=""><source src="listen/overall/speaker2/baseline/eval-04.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker2/proposed/eval-04.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker3</td>
+          <td><audio controls=""><source src="listen/overall/speaker3/baseline/eval-04.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker3/proposed/eval-04.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker4</td>
+          <td><audio controls=""><source src="listen/overall/speaker4/proposed/eval-04.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker4/proposed/eval-04.wav"></audio></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <table>
+      <tbody>
+        <tr>
+          <th>Speaker</th>
+          <th>Baseline</th>
+          <th>Proposed</th>
+        </tr>
+        <tr><td>Speaker1</td>
+          <td><audio controls=""><source src="listen/overall/speaker1/baseline/eval-13.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker1/proposed/eval-13.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker2</td>
+          <td><audio controls=""><source src="listen/overall/speaker2/baseline/eval-13.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker2/proposed/eval-13.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker3</td>
+          <td><audio controls=""><source src="listen/overall/speaker3/baseline/eval-13.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker3/proposed/eval-13.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker4</td>
+          <td><audio controls=""><source src="listen/overall/speaker4/proposed/eval-13.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker4/proposed/eval-13.wav"></audio></td>
+        </tr>
+      </tbody>
+    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <table>
+      <tbody>
+        <tr>
+          <th>Speaker</th>
+          <th>Baseline</th>
+          <th>Proposed</th>
+        </tr>
+        <tr><td>Speaker1</td>
+          <td><audio controls=""><source src="listen/overall/speaker1/baseline/eval-16.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker1/proposed/eval-16.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker2</td>
+          <td><audio controls=""><source src="listen/overall/speaker2/baseline/eval-16.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker2/proposed/eval-16.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker3</td>
+          <td><audio controls=""><source src="listen/overall/speaker3/baseline/eval-16.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker3/proposed/eval-16.wav"></audio></td>
+        </tr>
+        <tr><td>Speaker4</td>
+          <td><audio controls=""><source src="listen/overall/speaker4/proposed/eval-16.wav"></audio></td>
+          <td><audio controls=""><source src="listen/overall/speaker4/proposed/eval-16.wav"></audio></td>
+        </tr>
+      </tbody>
+    </table>
+    </table>
+
+      <a name="neural_vocoder.style_selection"><h3>Enhancing premium voice</h3></a>
+      <a name="neural_vocoder.style_selection"><h3>1 Enhancing premium voice</h3></a>
+     <div class="text_gst">Text: And without a backward glance at Harry, Filch ran flat-footed from the office, Mrs. Norris streaking alongside him. Peeves was the school poltergeist, a grinning, airborne menace who lived to cause havoc and distress.</div>
+      <table><tbody>
+        <tr><td>Single Speaker</td><td><audio controls=""><source src="listen/premium_voice/singlespeaker/eval-01.wav"></audio></td><td>Baseline</td><td><audio controls=""><source src="listen/premium_voice/baseline/eval-01.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/premium_voice/proposed/eval-01.wav"></audio></td><td></tr>
+      </tbody></table>
+      <div class="text_gst">Text: "I expect they've let it rot to give it a stronger flavor," said Hermione knowledgeably, pinching her nose and leaning closer to look at the putrid haggis. "Can we move? I feel sick," said Ron.</div>
+      <table><tbody>
+        <tr><td>Single Speaker</td><td><audio controls=""><source src="listen/premium_voice/singlespeaker/eval-01.wav"></audio></td><td>Baseline</td><td><audio controls=""><source src="listen/premium_voice/baseline/eval-06.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/premium_voice/proposed/eval-06.wav"></audio></td><td></tr>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>Single Speaker</td><td><audio controls=""><source src="listen/premium_voice/singlespeaker/eval-01.wav"></audio></td><td>Baseline</td><td><audio controls=""><source src="listen/premium_voice/baseline/eval-10.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/premium_voice/proposed/eval-10.wav"></audio></td><td></tr> 
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>Single Speaker</td><td><audio controls=""><source src="listen/premium_voice/singlespeaker/eval-01.wav"></audio></td><td>Baseline</td><td><audio controls=""><source src="listen/premium_voice/baseline/eval-14.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/premium_voice/proposed/eval-14.wav"></audio></td><td></tr>
+      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <table><tbody>
+        <tr><td>Single Speaker</td><td><audio controls=""><source src="listen/premium_voice/singlespeaker/eval-01.wav"></audio></td><td>Baseline</td><td><audio controls=""><source src="listen/premium_voice/baseline/eval-19.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/premium_voice/proposed/eval-19.wav"></audio></td><td></tr>
+	
+      <a name="neural_vocoder.style_selection"><h3>2 Different speaker with different data size</h3></a>	  
+    </div>
+    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <table>
+      <tbody>
+        <tr>
+          <th># Utterance</th>
+          <th>Baseline</th>
+          <th>Proposed</th>
+        </tr>
+        <tr><td>100</td>
+          <td><audio controls=""><source src="listen/data_size/100/baseline/eval-01.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/100/proposed/eval-01.wav"></audio></td>
+        </tr>
+        <tr><td>500</td>
+          <td><audio controls=""><source src="listen/data_size/500/baseline/eval-01.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/500/proposed/eval-01.wav"></audio></td>
+        </tr>
+        <tr><td>1000</td>
+          <td><audio controls=""><source src="listen/data_size/1000/baseline/eval-01.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/1000/proposed/eval-01.wav"></audio></td>
+        </tr>
+        <tr><td>10000</td>
+          <td><audio controls=""><source src="listen/data_size/10000/proposed/eval-01.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/10000/proposed/eval-01.wav"></audio></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <table>
+      <tbody>
+        <tr>
+          <th># Utterance</th>
+          <th>Baseline</th>
+          <th>Proposed</th>
+        </tr>
+        <tr><td>100</td>
+          <td><audio controls=""><source src="listen/data_size/100/baseline/eval-06.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/100/proposed/eval-06.wav"></audio></td>
+        </tr>
+        <tr><td>500</td>
+          <td><audio controls=""><source src="listen/data_size/500/baseline/eval-06.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/500/proposed/eval-06.wav"></audio></td>
+        </tr>
+        <tr><td>1000</td>
+          <td><audio controls=""><source src="listen/data_size/1000/baseline/eval-06.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/1000/proposed/eval-06.wav"></audio></td>
+        </tr>
+        <tr><td>10000</td>
+          <td><audio controls=""><source src="listen/data_size/10000/proposed/eval-06.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/10000/proposed/eval-06.wav"></audio></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <table>
+      <tbody>
+        <tr>
+          <th># Utterance</th>
+          <th>Baseline</th>
+          <th>Proposed</th>
+        </tr>
+        <tr><td>100</td>
+          <td><audio controls=""><source src="listen/data_size/100/baseline/eval-10.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/100/proposed/eval-10.wav"></audio></td>
+        </tr>
+        <tr><td>500</td>
+          <td><audio controls=""><source src="listen/data_size/500/baseline/eval-10.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/500/proposed/eval-10.wav"></audio></td>
+        </tr>
+        <tr><td>1000</td>
+          <td><audio controls=""><source src="listen/data_size/1000/baseline/eval-10.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/1000/proposed/eval-10.wav"></audio></td>
+        </tr>
+        <tr><td>10000</td>
+          <td><audio controls=""><source src="listen/data_size/10000/proposed/eval-10.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/10000/proposed/eval-10.wav"></audio></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <table>
+      <tbody>
+        <tr>
+          <th># Utterance</th>
+          <th>Baseline</th>
+          <th>Proposed</th>
+        </tr>
+        <tr><td>100</td>
+          <td><audio controls=""><source src="listen/data_size/100/baseline/eval-14.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/100/proposed/eval-14.wav"></audio></td>
+        </tr>
+        <tr><td>500</td>
+          <td><audio controls=""><source src="listen/data_size/500/baseline/eval-14.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/500/proposed/eval-14.wav"></audio></td>
+        </tr>
+        <tr><td>1000</td>
+          <td><audio controls=""><source src="listen/data_size/1000/baseline/eval-14.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/1000/proposed/eval-14.wav"></audio></td>
+        </tr>
+        <tr><td>10000</td>
+          <td><audio controls=""><source src="listen/data_size/10000/proposed/eval-14.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/10000/proposed/eval-14.wav"></audio></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <table>
+      <tbody>
+        <tr>
+          <th># Utterance</th>
+          <th>Baseline</th>
+          <th>Proposed</th>
+        </tr>
+        <tr><td>100</td>
+          <td><audio controls=""><source src="listen/data_size/100/baseline/eval-19.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/100/proposed/eval-19.wav"></audio></td>
+        </tr>
+        <tr><td>500</td>
+          <td><audio controls=""><source src="listen/data_size/500/baseline/eval-19.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/500/proposed/eval-19.wav"></audio></td>
+        </tr>
+        <tr><td>1000</td>
+          <td><audio controls=""><source src="listen/data_size/1000/baseline/eval-19.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/1000/proposed/eval-19.wav"></audio></td>
+        </tr>
+        <tr><td>10000</td>
+          <td><audio controls=""><source src="listen/data_size/10000/proposed/eval-19.wav"></audio></td>
+          <td><audio controls=""><source src="listen/data_size/10000/proposed/eval-19.wav"></audio></td>
+        </tr>
+      </tbody>
+    </table>
+
+	 
+</body></html>
