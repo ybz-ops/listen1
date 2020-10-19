@@ -1,6 +1,6 @@
-<html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="Content-Language" content="zh-cn">
     <title>Audio samples from "AN INVESTIGATION OF FAST AND EFFICIENT METHODS FOR MULTI-SPEAKER MODELING AND SPEAKER ADAPTATION"</title>
     <link rel="stylesheet" href="../../stylesheet.css">
     <link rel="shortcut icon" href="../../images/taco.png">
@@ -17,130 +17,101 @@
     <div><b>Abstract:</b> In this paper, we propose a novel method for fast and efficient few-shot TTS tasks, which is able to disentangle linguistic and speaker representations. Specifically, an adversarial training strategy is firstly employed to  wipe out speaker information from the linguistic representations. Then the speaker representations are extracted from audio signals by a speaker encoder with random sampling mechanism and a speaker classifier, aiming to extract speaker embedding features that independent of content information (such as prosody and style etc).  Meanwhile,  for faster and efficient adaptation, we further introduce the prior alignment knowledge between the text and audio pairs and propose a multi-alignment guided attention to help the attention learning.  The Experimental results show that proposed method could not only generate both higher quality and similarity with an absolute improvement of 0.32 and 0.4 in MOS respectively,  when adapting new speakers with 20 utterances, but also converge much faster and efficient.    Moreover, we can achieve a MOS of 4.** for a premium voice with enough training data, and outperforms baseline result of 4.**.</div>
 
 
-    <p class="toc_title">Contents</p>
-    <div id="toc_container">
-    <ul>
-      <li><a href="#neural_vocoder">Style Tokens with neural vocoding</a></li>
-        <ol>
-          <li><a href="#neural_vocoder.style_selection">Style Selection</a></li>
-          <li><a href="#neural_vocoder.doesnt_affect_prosody">Prosody vs Audio Quality</a></li>
-        </ol>
-      <li><a href="#style_control">Style control</a></li>
-        <ol>
-          <li><a href="#style_control.selection">Style selection</a></li>
-          <li><a href="#style_control.scaling">Style scaling</a></li>
-          <li><a href="#style_control.morphing">Text-side style control/morphing</a></li>
-        </ol>
-    <li><a href="#style_transfer">Style transfer</a></li>
-      <ol>
-        <li><a href="#style_transfer.parallel">Parallel transfer</a></li>
-        <li><a href="#style_transfer.nonparallel">Non-parallel transfer</a></li>
-      </ol>
-    <li><a href="#noisy_data">Artificial noisy data</a></li>
-      <ol>
-        <li><a href="#noisy_data.learned_tokens">Tokens learned from a noisy dataset</a></li>
-        <li><a href="#noisy_data.clean_token_synth">Synthesizing with a clean Style Token</a></li>
-      </ol>
-    </ul>
-    </div>
-
-    <p>&nbsp;</p>
 
     <div>
       <a name="neural_vocoder"><h2>Speaker adaptation with small dataset</h2></a>
       <div>
         In this section, we use 4 Chinese speakers as target speaker, with each speakers has only 20 utterances (1-2 minutes of speech).
       </div>
-      <a name="neural_vocoder.style_selection"><h3>Speaker latent space modeling</h3></a>
-      <a name="neural_audiobook"><h3>1. Long-form audiobook phrases </h3></a>
+      <a name="neural_vocoder.style_selection"><h3>1. Speaker latent space modeling</h3></a>
 
-      <div class="text_gst">Text: And without a backward glance at Harry, Filch ran flat-footed from the office, Mrs. Norris streaking alongside him. Peeves was the school poltergeist, a grinning, airborne menace who lived to cause havoc and distress.</div>
+      <div class="text_gst">Text: “在周日上午播出的另一个采访中，埃斯珀说。 (zai4 zhou1 ri4 shang4 wu3 bo1 chu1 de5 ling4 yi2 ge4 cai6 fang3 zhong1 ,  ai1 si1 po4 shuo1 .)”</div>
       <table><tbody>
         <tr><td>One-hot</td><td><audio controls=""><source src="listen/speaker_latent_space/one_hot/eval-03.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/speaker_latent_space/proposed/eval-03.wav"></audio></td></tr>
       </tbody></table>
-      <div class="text_gst">Text: "I expect they've let it rot to give it a stronger flavor," said Hermione knowledgeably, pinching her nose and leaning closer to look at the putrid haggis. "Can we move? I feel sick," said Ron.</div>
+      <div class="text_gst">Text: “特恩布尔还表示。(te4 en1 bu4 er3 hai2 biao3 shi4 .)”</div>
       <table><tbody>
         <tr><td>One-hot</td><td><audio controls=""><source src="listen/speaker_latent_space/one_hot/eval-04.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/speaker_latent_space/proposed/eval-04.wav"></audio></td></tr>
       </tbody></table>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “据报道，特恩布尔在二零一八年八月二十三日卸任澳大利亚总理前一天。(jv4 bao4 dao4 , te4 en1 bu4 er3 zai4 er4 ling2 yi1 ba1 nian2 ba1 yve4 er4 shi2 san1 ri4 xie4 ren4 ao4 da4 li4 ya4 zong6 li3 qian2 yi4 tian1 .)”</div>
       <table><tbody>
         <tr><td>One-hot</td><td><audio controls=""><source src="listen/speaker_latent_space/one_hot/eval-05.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/speaker_latent_space/proposed/eval-05.wav"></audio></td></tr>
      </tbody></table>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “被发现持有伪造的两张身份证，且两张有效期不，报道称。(bei4 fa1 xian4 chi2 you6 wei3 zao4 de5 liang3 zhang1 shen1 fen4 zheng4 , qie6 liang3 zhang1 you3 xiao4 qi1 bu4 tong2 , bao4 dao5 cheng1 .)”</div>
       <table><tbody>
         <tr><td>One-hot</td><td><audio controls=""><source src="listen/speaker_latent_space/one_hot/eval-14.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/speaker_latent_space/proposed/eval-14.wav"></audio></td></tr>
       </tbody></table>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “王诗超还被怀疑涉嫌与姓名不详者合谋。(wang2 shi1 chao1 hai2 bei4 huai2 yi2 she4 xian2 yv3 xing4 ming2 bu4 xiang2 zhe3 he2 mou2 .)”</div>
       <table><tbody>
         <tr><td>One-hot</td><td><audio controls=""><source src="listen/speaker_latent_space/one_hot/eval-15.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/speaker_latent_space/proposed/eval-15.wav"></audio></td></tr>
       </tbody></table>
 	  
-      <a name="neural_vocoder.style_selection"><h3>average model</h3></a>
-      <div class="text_gst">Text: And without a backward glance at Harry, Filch ran flat-footed from the office, Mrs. Norris streaking alongside him. Peeves was the school poltergeist, a grinning, airborne menace who lived to cause havoc and distress.</div>
+      <a name="neural_vocoder.style_selection"><h3>2. Average model</h3></a>
+      <div class="text_gst">Text: “在周日上午播出的另一个采访中，埃斯珀说。 (zai4 zhou1 ri4 shang4 wu3 bo1 chu1 de5 ling4 yi2 ge4 cai6 fang3 zhong1 ,  ai1 si1 po4 shuo1 .)”</div>
       <table><tbody>
         <tr><td>SE</td><td><audio controls=""><source src="listen/average_model/SE/eval-03.wav"></audio></td><td>SE+AT</td><td><audio controls=""><source src="listen/average_model/SE+AT/eval-03.wav"></audio></td></tr>
       </tbody></table>
-      <div class="text_gst">Text: "I expect they've let it rot to give it a stronger flavor," said Hermione knowledgeably, pinching her nose and leaning closer to look at the putrid haggis. "Can we move? I feel sick," said Ron.</div>
+      <div class="text_gst">Text: “特恩布尔还表示。(te4 en1 bu4 er3 hai2 biao3 shi4 .)”</div>
       <table><tbody>
         <tr><td>SE</td><td><audio controls=""><source src="listen/average_model/SE/eval-04.wav"></audio></td><td>SE+AT</td><td><audio controls=""><source src="listen/average_model/SE+AT/eval-04.wav"></audio></td></tr>
       </tbody></table>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “据报道，特恩布尔在二零一八年八月二十三日卸任澳大利亚总理前一天。(jv4 bao4 dao4 , te4 en1 bu4 er3 zai4 er4 ling2 yi1 ba1 nian2 ba1 yve4 er4 shi2 san1 ri4 xie4 ren4 ao4 da4 li4 ya4 zong6 li3 qian2 yi4 tian1 .)”</div>
       <table><tbody>
         <tr><td>SE</td><td><audio controls=""><source src="listen/average_model/SE/eval-05.wav"></audio></td><td>SE+AT</td><td><audio controls=""><source src="listen/average_model/SE+AT/eval-05.wav"></audio></td></tr>
      </tbody></table>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “被发现持有伪造的两张身份证，且两张有效期不，报道称。(bei4 fa1 xian4 chi2 you6 wei3 zao4 de5 liang3 zhang1 shen1 fen4 zheng4 , qie6 liang3 zhang1 you3 xiao4 qi1 bu4 tong2 , bao4 dao5 cheng1 .)”</div>
       <table><tbody>
         <tr><td>SE</td><td><audio controls=""><source src="listen/average_model/SE/eval-14.wav"></audio></td><td>SE+AT</td><td><audio controls=""><source src="listen/average_model/SE+AT/eval-14.wav"></audio></td></tr>
       </tbody></table>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “王诗超还被怀疑涉嫌与姓名不详者合谋。(wang2 shi1 chao1 hai2 bei4 huai2 yi2 she4 xian2 yv3 xing4 ming2 bu4 xiang2 zhe3 he2 mou2 .)”</div>
       <table><tbody>
         <tr><td>SE</td><td><audio controls=""><source src="listen/average_model/SE/eval-15.wav"></audio></td><td>SE+AT</td><td><audio controls=""><source src="listen/average_model/SE+AT/eval-15.wav"></audio></td></tr>
       </tbody></table>
 	  
-      <a name="neural_vocoder.style_selection"><h3>training strategies</h3></a>
-      <a name="neural_audiobook"><h3>1. fix text encoder </h3></a>
-      <div class="text_gst">Text: And without a backward glance at Harry, Filch ran flat-footed from the office, Mrs. Norris streaking alongside him. Peeves was the school poltergeist, a grinning, airborne menace who lived to cause havoc and distress.</div>
+      <a name="neural_vocoder.style_selection"><h3>3. Training strategies</h3></a>
+      <a name="neural_audiobook"><h3>A. Fix text encoder </h3></a>
+       <div class="text_gst">Text: “在周日上午播出的另一个采访中，埃斯珀说。 (zai4 zhou1 ri4 shang4 wu3 bo1 chu1 de5 ling4 yi2 ge4 cai6 fang3 zhong1 ,  ai1 si1 po4 shuo1 .)”</div>
       <table><tbody>
-        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encode/fix/eval-03.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encode/all/eval-03.wav"></audio></td></tr>
+        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encoder/fix/eval-03.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encoder/all/eval-03.wav"></audio></td></tr>
       </tbody></table>
-      <div class="text_gst">Text: "I expect they've let it rot to give it a stronger flavor," said Hermione knowledgeably, pinching her nose and leaning closer to look at the putrid haggis. "Can we move? I feel sick," said Ron.</div>
+      <div class="text_gst">Text: “特恩布尔还表示。(te4 en1 bu4 er3 hai2 biao3 shi4 .)”</div>
       <table><tbody>
-        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encode/fix/eval-04.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encode/all/eval-04.wav"></audio></td></tr>
+        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encoder/fix/eval-04.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encoder/all/eval-04.wav"></audio></td></tr>
       </tbody></table>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “据报道，特恩布尔在二零一八年八月二十三日卸任澳大利亚总理前一天。(jv4 bao4 dao4 , te4 en1 bu4 er3 zai4 er4 ling2 yi1 ba1 nian2 ba1 yve4 er4 shi2 san1 ri4 xie4 ren4 ao4 da4 li4 ya4 zong6 li3 qian2 yi4 tian1 .)”</div>
       <table><tbody>
-        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encode/fix/eval-05.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encode/all/eval-05.wav"></audio></td></tr>
+        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encoder/fix/eval-05.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encoder/all/eval-05.wav"></audio></td></tr>
      </tbody></table>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “被发现持有伪造的两张身份证，且两张有效期不，报道称。(bei4 fa1 xian4 chi2 you6 wei3 zao4 de5 liang3 zhang1 shen1 fen4 zheng4 , qie6 liang3 zhang1 you3 xiao4 qi1 bu4 tong2 , bao4 dao5 cheng1 .)”</div>
       <table><tbody>
-        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encode/fix/eval-14.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encode/all/eval-14.wav"></audio></td></tr>
+        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encoder/fix/eval-14.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encoder/all/eval-14.wav"></audio></td></tr>
       </tbody></table>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “王诗超还被怀疑涉嫌与姓名不详者合谋。(wang2 shi1 chao1 hai2 bei4 huai2 yi2 she4 xian2 yv3 xing4 ming2 bu4 xiang2 zhe3 he2 mou2 .)”</div>
       <table><tbody>
-        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encode/fix/eval-15.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encode/all/eval-15.wav"></audio></td></tr>
+        <tr><td>fix_text_encoder(Baseline-All)</td><td><audio controls=""><source src="listen/fix_text_encoder/fix/eval-15.wav"></audio></td><td>Update_All(Baseline)</td><td><audio controls=""><source src="listen/fix_text_encode/all/eval-15.wav"></audio></td></tr>
       </tbody></table>
 
-      <a name="neural_audiobook"><h3>2. guided attention</h3></a>	  
-     <div class="text_gst">Text: And without a backward glance at Harry, Filch ran flat-footed from the office, Mrs. Norris streaking alongside him. Peeves was the school poltergeist, a grinning, airborne menace who lived to cause havoc and distress.</div>
+      <a name="neural_audiobook"><h3>B. Guided attention</h3></a>	  
+     <div class="text_gst">Text: “在周日上午播出的另一个采访中，埃斯珀说。 (zai4 zhou1 ri4 shang4 wu3 bo1 chu1 de5 ling4 yi2 ge4 cai6 fang3 zhong1 ,  ai1 si1 po4 shuo1 .)”</div>
       <table><tbody>
         <tr><td>Baseline</td><td><audio controls=""><source src="listen/guided_attention/Baseline/eval-03.wav"></audio></td><td>GA</td><td><audio controls=""><source src="listen/guided_attention/GA/eval-03.wav"></audio></td><td>FA</td><td><audio controls=""><source src="listen/guided_attention/FA/eval-03.wav"></audio></td><td>MAGT</td><td><audio controls=""><source src="listen/guided_attention/MAGT/eval-03.wav"></audio></td></tr>
       </tbody></table>
-      <div class="text_gst">Text: "I expect they've let it rot to give it a stronger flavor," said Hermione knowledgeably, pinching her nose and leaning closer to look at the putrid haggis. "Can we move? I feel sick," said Ron.</div>
+      <div class="text_gst">Text: “特恩布尔还表示。(te4 en1 bu4 er3 hai2 biao3 shi4 .)”</div>
       <table><tbody>
         <tr><td>Baseline</td><td><audio controls=""><source src="listen/guided_attention/Baseline/eval-04.wav"></audio></td><td>GA</td><td><audio controls=""><source src="listen/guided_attention/GA/eval-04.wav"></audio></td><td>FA</td><td><audio controls=""><source src="listen/guided_attention/FA/eval-04.wav"></audio></td><td>MAGT</td><td><audio controls=""><source src="listen/guided_attention/MAGT/eval-04.wav"></audio></td></tr>      </tbody></table>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “此前，策划袭击四个美国大使馆这一说法。(ci3 qian2 , ce4 hua4 xi2 ji1 si4 ge5 mei3 guo2 da4 shi6 guan3 zhe4 yi4 shuo1 fa3 . )”</div>
       <table><tbody>
         <tr><td>Baseline</td><td><audio controls=""><source src="listen/guided_attention/Baseline/eval-02.wav"></audio></td><td>GA</td><td><audio controls=""><source src="listen/guided_attention/GA/eval-02.wav"></audio></td><td>FA</td><td><audio controls=""><source src="listen/guided_attention/FA/eval-02.wav"></audio></td><td>MAGT</td><td><audio controls=""><source src="listen/guided_attention/MAGT/eval-02.wav"></audio></td></tr>     </tbody></table>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “美国情报部队获得伊朗军用雷达开机的电子信号。(mei3 guo2 qing2 bao4 bu4 dui4 huo4 de2 yi1 lang3 jvn1 yong4 lei2 da2 kai1 ji1 de5 dian4 zi3 xin4 hao4 .) ”</div>
       <table><tbody>
         <tr><td>Baseline</td><td><audio controls=""><source src="listen/guided_attention/Baseline/eval-19.wav"></audio></td><td>GA</td><td><audio controls=""><source src="listen/guided_attention/GA/eval-19.wav"></audio></td><td>FA</td><td><audio controls=""><source src="listen/guided_attention/FA/eval-19.wav"></audio></td><td>MAGT</td><td><audio controls=""><source src="listen/guided_attention/MAGT/eval-19.wav"></audio></td></tr>      </tbody></table>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “王诗超还被怀疑涉嫌与姓名不详者合谋。(wang2 shi1 chao1 hai2 bei4 huai2 yi2 she4 xian2 yv3 xing4 ming2 bu4 xiang2 zhe3 he2 mou2 .)”</div>
       <table><tbody>
         <tr><td>Baseline</td><td><audio controls=""><source src="listen/guided_attention/Baseline/eval-15.wav"></audio></td><td>GA</td><td><audio controls=""><source src="listen/guided_attention/GA/eval-15.wav"></audio></td><td>FA</td><td><audio controls=""><source src="listen/guided_attention/FA/eval-15.wav"></audio></td><td>MAGT</td><td><audio controls=""><source src="listen/guided_attention/MAGT/eval-15.wav"></audio></td></tr>      </tbody></table>
 	  
-      <a name="neural_vocoder.style_selection"><h3>overall performance</h3></a>
+      <a name="neural_vocoder.style_selection"><h3>Overall performance</h3></a>
     </div>
-    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <div class="text_gst">Text: “此前，策划袭击四个美国大使馆这一说法。(ci3 qian2 , ce4 hua4 xi2 ji1 si4 ge5 mei3 guo2 da4 shi6 guan3 zhe4 yi4 shuo1 fa3 . )”</div>
     <table>
       <tbody>
         <tr>
@@ -167,7 +138,7 @@
       </tbody>
     </table>
 
-    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <div class="text_gst">Text: “在周日上午播出的另一个采访中，埃斯珀说。 (zai4 zhou1 ri4 shang4 wu3 bo1 chu1 de5 ling4 yi2 ge4 cai6 fang3 zhong1 ,  ai1 si1 po4 shuo1 .)”</div>
     <table>
       <tbody>
         <tr>
@@ -194,7 +165,7 @@
       </tbody>
     </table>
 
-    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <div class="text_gst">Text: “特恩布尔还表示。(te4 en1 bu4 er3 hai2 biao3 shi4 .)”</div>
     <table>
       <tbody>
         <tr>
@@ -221,7 +192,7 @@
       </tbody>
     </table>
 
-    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <div class="text_gst">Text: “去年十月上旬，王诗超在东京接受警察盘问。(qv4 nian2 shi2 yve4 shang4 xvn2 , wang2 shi1 chao1 zai4 dong1 jing1 jie1 shou4 jing3 cha2 pan2 wen4 . )”</div>
     <table>
       <tbody>
         <tr>
@@ -246,7 +217,7 @@
           <td><audio controls=""><source src="listen/overall/speaker4/proposed/eval-13.wav"></audio></td>
         </tr>
       </tbody>
-    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <div class="text_gst">Text: “于去年八月，在中国或周边地区伪造了其中一张身份证。(yv2 qv4 nian2 ba1 yve4 , zai4 zhong1 guo2 huo4 zhou1 bian1 di4 qv1 wei3 zao4 le5 qi2 zhong1 yi4 zhang1 shen1 fen4 zheng4 . )”</div>
     <table>
       <tbody>
         <tr>
@@ -275,27 +246,29 @@
     </table>
 
       <a name="neural_vocoder.style_selection"><h3>Enhancing premium voice</h3></a>
-      <a name="neural_vocoder.style_selection"><h3>1 Enhancing premium voice</h3></a>
-     <div class="text_gst">Text: And without a backward glance at Harry, Filch ran flat-footed from the office, Mrs. Norris streaking alongside him. Peeves was the school poltergeist, a grinning, airborne menace who lived to cause havoc and distress.</div>
+      <a name="neural_vocoder.style_selection"><h3>1. Enhancing premium voice</h3></a>
+     <div class="text_gst">Text: “据美国有线电视新闻网十二日报道。(jv4 mei3 guo2 you3 xian4 dian4 shi4 xin1 wen2 wang3 shi2 er4 ri4 bao4 dao4 . )”</div>
       <table><tbody>
         <tr><td>Single Speaker</td><td><audio controls=""><source src="listen/premium_voice/singlespeaker/eval-01.wav"></audio></td><td>Baseline</td><td><audio controls=""><source src="listen/premium_voice/baseline/eval-01.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/premium_voice/proposed/eval-01.wav"></audio></td><td></tr>
       </tbody></table>
-      <div class="text_gst">Text: "I expect they've let it rot to give it a stronger flavor," said Hermione knowledgeably, pinching her nose and leaning closer to look at the putrid haggis. "Can we move? I feel sick," said Ron.</div>
+      <div class="text_gst">Text: “伊朗总统哈桑鲁哈尼近日警告称，美国试图夺取对叙利亚油井的控制权。(yi1 lang3 zong6 tong3 ha1 sang1 lu3 ha1 ni2 jin4 ri4 jing3 gao4 cheng1 , mei3 guo2 shi4 tu2 duo2 qv3 dui4 xv4 li4 ya4 you2 jing3 de5 kong4 zhi4 qvan2 . )”</div>
       <table><tbody>
         <tr><td>Single Speaker</td><td><audio controls=""><source src="listen/premium_voice/singlespeaker/eval-01.wav"></audio></td><td>Baseline</td><td><audio controls=""><source src="listen/premium_voice/baseline/eval-06.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/premium_voice/proposed/eval-06.wav"></audio></td><td></tr>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “日媒称，涉嫌伪造陆上自卫官身份证。中国留学生被日方逮捕。(ri4 mei2 cheng1 , she4 xian2 wei3 zao4 lu4 shang4 zi4 wei4 guan1 shen1 fen4 zheng4 . zhong1 guo2 liu2 xve2 sheng1 bei4 ri4 fang1 dai4 bu3 . )”</div>
       <table><tbody>
         <tr><td>Single Speaker</td><td><audio controls=""><source src="listen/premium_voice/singlespeaker/eval-01.wav"></audio></td><td>Baseline</td><td><audio controls=""><source src="listen/premium_voice/baseline/eval-10.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/premium_voice/proposed/eval-10.wav"></audio></td><td></tr> 
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “被发现持有伪造的两张身份证，且两张有效期不，报道称。(bei4 fa1 xian4 chi2 you6 wei3 zao4 de5 liang3 zhang1 shen1 fen4 zheng4 , qie6 liang3 zhang1 you3 xiao4 qi1 bu4 tong2 , bao4 dao5 cheng1 .)”</div>
       <table><tbody>
         <tr><td>Single Speaker</td><td><audio controls=""><source src="listen/premium_voice/singlespeaker/eval-01.wav"></audio></td><td>Baseline</td><td><audio controls=""><source src="listen/premium_voice/baseline/eval-14.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/premium_voice/proposed/eval-14.wav"></audio></td><td></tr>
-      <div class="text_gst">Text: There had been a flying motorcycle in it. He had a funny feeling he'd had the same dream before. His aunt was back outside the door. "Are you up yet?" she demanded.</div>
+      <div class="text_gst">Text: “美国情报部队获得伊朗军用雷达开机的电子信号。(mei3 guo2 qing2 bao4 bu4 dui4 huo4 de2 yi1 lang3 jvn1 yong4 lei2 da2 kai1 ji1 de5 dian4 zi3 xin4 hao4 .)”</div>
       <table><tbody>
         <tr><td>Single Speaker</td><td><audio controls=""><source src="listen/premium_voice/singlespeaker/eval-01.wav"></audio></td><td>Baseline</td><td><audio controls=""><source src="listen/premium_voice/baseline/eval-19.wav"></audio></td><td>Proposed</td><td><audio controls=""><source src="listen/premium_voice/proposed/eval-19.wav"></audio></td><td></tr>
-	
-      <a name="neural_vocoder.style_selection"><h3>2 Different speaker with different data size</h3></a>	  
+      </tbody></table>
+	  
+      <a name="neural_vocoder.style_selection"><h3>2. Different speaker with different data size</h3></a>	  
     </div>
-    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <div class="text_gst">Text: “据美国有线电视新闻网十二日报道。(jv4 mei3 guo2 you3 xian4 dian4 shi4 xin1 wen2 wang3 shi2 er4 ri4 bao4 dao4 . )”</div>
+      <table><tbody>
     <table>
       <tbody>
         <tr>
@@ -321,7 +294,7 @@
         </tr>
       </tbody>
     </table>
-    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+     <div class="text_gst">Text: “伊朗总统哈桑鲁哈尼近日警告称，美国试图夺取对叙利亚油井的控制权。(yi1 lang3 zong6 tong3 ha1 sang1 lu3 ha1 ni2 jin4 ri4 jing3 gao4 cheng1 , mei3 guo2 shi4 tu2 duo2 qv3 dui4 xv4 li4 ya4 you2 jing3 de5 kong4 zhi4 qvan2 . )”</div>
     <table>
       <tbody>
         <tr>
@@ -347,7 +320,7 @@
         </tr>
       </tbody>
     </table>
-    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <div class="text_gst">Text: “日媒称，涉嫌伪造陆上自卫官身份证。中国留学生被日方逮捕。(ri4 mei2 cheng1 , she4 xian2 wei3 zao4 lu4 shang4 zi4 wei4 guan1 shen1 fen4 zheng4 . zhong1 guo2 liu2 xve2 sheng1 bei4 ri4 fang1 dai4 bu3 . )”</div>
     <table>
       <tbody>
         <tr>
@@ -373,7 +346,7 @@
         </tr>
       </tbody>
     </table>
-    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <div class="text_gst">Text: “被发现持有伪造的两张身份证，且两张有效期不，报道称。(bei4 fa1 xian4 chi2 you6 wei3 zao4 de5 liang3 zhang1 shen1 fen4 zheng4 , qie6 liang3 zhang1 you3 xiao4 qi1 bu4 tong2 , bao4 dao5 cheng1 .)”</div>
     <table>
       <tbody>
         <tr>
@@ -399,7 +372,7 @@
         </tr>
       </tbody>
     </table>
-    <div class="text_gst">Text: "Oh, to travel, to travel!" cried he; "there is no greater happiness in the world: it is the height of my ambition."</div>
+    <div class="text_gst">Text: “美国情报部队获得伊朗军用雷达开机的电子信号。(mei3 guo2 qing2 bao4 bu4 dui4 huo4 de2 yi1 lang3 jvn1 yong4 lei2 da2 kai1 ji1 de5 dian4 zi3 xin4 hao4 .)”</div>
     <table>
       <tbody>
         <tr>
